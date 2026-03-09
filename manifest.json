@@ -3,7 +3,6 @@
   "short_name": "Spese",
   "description": "Tracker spese personali",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0c0b09",
