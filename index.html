@@ -341,6 +341,19 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-h
       <div class="bal-col" style="text-align:center;border-left:1px solid var(--bd);border-right:1px solid var(--bd);padding:0 8px"><div class="bal-lbl">Saldo netto</div><div class="bal-val neu" id="balNet">€0</div><div class="bal-sub" id="balNetPct">—</div></div>
       <div class="bal-col" style="text-align:right"><div class="bal-lbl">Risparmio</div><div class="bal-val pos" id="balSav">€0</div><div class="bal-sub" id="balSavPct">0% reddito</div></div>
     </div>
+    <!-- Patrimonio card -->
+    <div onclick="switchView('invest')" style="cursor:pointer;margin-top:10px;background:linear-gradient(135deg,var(--grnd),var(--sf));border:1px solid rgba(125,232,166,.35);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div>
+        <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--txd);margin-bottom:4px">📊 Patrimonio Totale</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:24px;letter-spacing:-.5px" id="homePatr">€—</div>
+        <div style="font-size:9px;color:var(--txm);margin-top:2px">liquidità + portafoglio</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:9px;color:var(--txd);margin-bottom:3px">📈 Portafoglio</div>
+        <div style="font-size:13px;font-weight:700;color:var(--grn)" id="homePort">—</div>
+        <div style="font-size:9px;color:var(--txm);margin-top:3px">tocca per dettagli →</div>
+      </div>
+    </div>
   </div>
   <div class="xp-bar-wrap" id="xpBarWrap">
     <div class="xp-bar-hdr">
@@ -502,6 +515,64 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-h
   </div>
 </div>
 
+<div class="view" id="investView">
+  <div class="sec" style="padding-top:16px">
+    <!-- Patrimonio card -->
+    <div style="background:linear-gradient(135deg,var(--sf2),var(--sf));border:1px solid var(--bd2);border-left:3px solid var(--ac);border-radius:18px;padding:19px;margin-bottom:10px;position:relative;overflow:hidden">
+      <div style="content:'';position:absolute;top:-55px;right:-55px;width:145px;height:145px;background:radial-gradient(circle,rgba(125,232,166,.12) 0%,transparent 65%);pointer-events:none"></div>
+      <div class="tot-lbl">Patrimonio Totale</div>
+      <div class="tot-amt"><span class="tot-cur">€</span><span id="invPatr">0,00</span></div>
+      <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:90px;background:var(--sf3);border-radius:11px;padding:9px 11px">
+          <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--txd);margin-bottom:4px">💰 Liquidità netta</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:18px" id="invLiquid">€0</div>
+          <div style="font-size:9px;color:var(--txm);margin-top:2px">entrate − uscite</div>
+        </div>
+        <div style="flex:1;min-width:90px;background:var(--sf3);border-radius:11px;padding:9px 11px">
+          <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--txd);margin-bottom:4px">📈 Portafoglio</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:18px;color:var(--grn)" id="invPortVal">€0</div>
+          <div style="font-size:9px;color:var(--txm);margin-top:2px" id="invPortDate">—</div>
+        </div>
+      </div>
+    </div>
+    <!-- KPI row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px">
+      <div class="mc"><div class="mc-lbl">Versato PAC</div><div class="mc-val" id="invTotPAC">€0</div><div class="mc-sub" id="invPacCnt">0 versamenti</div></div>
+      <div class="mc"><div class="mc-lbl">Rendimento</div><div class="mc-val" id="invGainEur" style="color:var(--grn)">+€0</div><div class="mc-sub" id="invGainPct">0%</div></div>
+      <div class="mc"><div class="mc-lbl">Media PAC</div><div class="mc-val" id="invAvgPac">€0</div><div class="mc-sub">per versamento</div></div>
+    </div>
+    <!-- Performance bar -->
+    <div id="invPerfBar" style="display:none;margin-bottom:14px;background:var(--sf);border:1px solid var(--bd);border-radius:13px;padding:12px 14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <div style="font-size:10px;font-weight:600;color:var(--txm)">Versato vs Valore attuale</div>
+        <div id="invPerfLbl" style="font-size:10px;font-weight:700;color:var(--grn)">+0%</div>
+      </div>
+      <div style="height:8px;background:var(--sf3);border-radius:10px;overflow:hidden;position:relative">
+        <div id="invPerfFill" style="height:100%;border-radius:10px;transition:width .8s cubic-bezier(.4,0,.2,1)"></div>
+        <div id="invPerfMk" style="position:absolute;top:-3px;height:14px;width:2px;background:var(--txd);border-radius:2px"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:9px;color:var(--txd)">
+        <span>€0</span><span id="invPerfMax">€0</span>
+      </div>
+    </div>
+    <!-- Aggiorna valore portafoglio -->
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:13px;margin-bottom:14px">
+      <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--txd);margin-bottom:9px">Aggiorna valore portafoglio</div>
+      <div style="display:flex;gap:7px;align-items:center">
+        <div class="amtwrap" style="flex:1"><span class="amtpfx">€</span><input class="fi" type="number" id="invPortInput" placeholder="es. 2340.50" step="0.01" inputmode="decimal" style="padding-left:28px;font-size:16px;font-weight:600;font-family:'Instrument Serif',serif"></div>
+        <button onclick="updatePortVal()" style="padding:10px 14px;border-radius:11px;border:none;background:var(--grn);color:#0c0b09;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0">Aggiorna ✓</button>
+      </div>
+      <div style="font-size:10px;color:var(--txd);margin-top:7px">Inserisci il valore attuale del tuo portafoglio TradeRepublic (lo vedi nell'app).</div>
+    </div>
+    <!-- Storico versamenti -->
+    <div class="sec-hdr" style="margin-bottom:10px">
+      <div class="sec-ttl">Storico versamenti PAC</div>
+      <div class="sec-act" onclick="openInvModal()">+ Aggiungi</div>
+    </div>
+    <div id="invList"></div>
+  </div>
+</div>
+
 <div class="bnav">
   <button class="nbtn active" id="navHome" onclick="switchView('home')"><span class="ni">⬡</span><span>Home</span></button>
   <button class="nbtn" id="navStats" onclick="switchView('stats')"><span class="ni">◎</span><span>Grafici</span></button>
@@ -509,6 +580,7 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-h
   <button class="nbtn" id="navIncome" onclick="switchView('income')"><span class="ni">💰</span><span>Entrate</span></button>
   <button class="nbtn" id="navBudget" onclick="switchView('budget')"><span class="ni">◈</span><span>Budget</span></button>
   <button class="nbtn" id="navSubs" onclick="switchView('subs')"><span class="ni">↻</span><span>Abb.</span></button>
+  <button class="nbtn" id="navInvest" onclick="switchView('invest')"><span class="ni">📈</span><span>Invest.</span></button>
 </div>
 
 <div class="moverlay" id="moverlay" onclick="closeModalOut(event)">
@@ -518,6 +590,7 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-h
       <button class="mtab active" id="tabExp" onclick="switchTab('exp')">💸 Spesa</button>
       <button class="mtab" id="tabInc" onclick="switchTab('inc')">💰 Entrata</button>
       <button class="mtab" id="tabSub" onclick="switchTab('sub')">🔄 Abbonamento</button>
+      <button class="mtab" id="tabInv" onclick="switchTab('inv')">📈 PAC</button>
     </div>
     <div id="formExp">
       <div style="font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:14px" id="expModalTitle">Nuova spesa</div>
@@ -536,7 +609,17 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-h
       </div>
       <button class="btn-p" id="expSubmitBtn" onclick="saveExpense()">Aggiungi spesa ✦</button>
     </div>
-    <div id="formInc" style="display:none">
+    <div id="formInv" style="display:none">
+      <div style="font-family:'Instrument Serif',serif;font-size:22px;margin-bottom:14px">Nuovo versamento PAC</div>
+      <div class="fg"><label class="fl">Importo versato</label><div class="amtwrap"><span class="amtpfx">€</span><input class="fi" type="number" id="invAmt" placeholder="es. 100" step="0.01" min="0" inputmode="decimal"></div></div>
+      <div class="fg"><label class="fl">Descrizione</label><input class="fi" type="text" id="invDesc" placeholder="es. PAC TradeRepublic marzo"></div>
+      <div class="frow2">
+        <div class="fg" style="margin-bottom:0"><label class="fl">Data</label><input class="fi" type="date" id="invDate"></div>
+        <div class="fg" style="margin-bottom:0"><label class="fl">Tipo</label><select class="fi fi-sel" id="invType"><option value="pac">🔄 PAC periodico</option><option value="extra">➕ Versamento extra</option><option value="dividend">💸 Dividendo</option><option value="sell">📤 Prelievo/Vendita</option></select></div>
+      </div>
+      <div class="fg" style="margin-top:13px"><label class="fl">Nota</label><input class="fi" type="text" id="invNote" placeholder="es. ETF MSCI World, piano mensile…"></div>
+      <button class="btn-p" style="background:var(--grn);color:#0c0b09" onclick="addInv()">Aggiungi versamento ✦</button>
+    </div>
       <div class="fg"><label class="fl">Importo</label><div class="amtwrap"><span class="amtpfx">€</span><input class="fi" type="number" id="iAmt" placeholder="0" step="0.01" min="0" inputmode="decimal"></div></div>
       <div class="fg"><label class="fl">Descrizione</label><input class="fi" type="text" id="iDesc" placeholder="es. Stipendio marzo, Freelance…"></div>
       <div class="frow2">
@@ -606,12 +689,14 @@ let exps=JSON.parse(localStorage.getItem('sp4_e')||'[]');
 let bgts=JSON.parse(localStorage.getItem('sp4_b')||'{}');
 let subs=JSON.parse(localStorage.getItem('sp4_s')||'[]');
 let incs=JSON.parse(localStorage.getItem('sp4_i')||'[]');
+let invs=JSON.parse(localStorage.getItem('sp4_inv')||'[]');
+let portVal=JSON.parse(localStorage.getItem('sp4_pv')||'null');
 let light=localStorage.getItem('sp4_t')==='light';
 let now=new Date();
 let sCat=null,sSub=null,sSubCat=null,editId=null;
 let view='home',hFil='all',tab='exp',rcptData=null;
 
-const sv=()=>{localStorage.setItem('sp4_e',JSON.stringify(exps));localStorage.setItem('sp4_b',JSON.stringify(bgts));localStorage.setItem('sp4_s',JSON.stringify(subs));localStorage.setItem('sp4_i',JSON.stringify(incs))};
+const sv=()=>{localStorage.setItem('sp4_e',JSON.stringify(exps));localStorage.setItem('sp4_b',JSON.stringify(bgts));localStorage.setItem('sp4_s',JSON.stringify(subs));localStorage.setItem('sp4_i',JSON.stringify(incs));localStorage.setItem('sp4_inv',JSON.stringify(invs));localStorage.setItem('sp4_pv',JSON.stringify(portVal))};
 const fmt=n=>n.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtk=n=>n>=1000?'€'+(n/1000).toFixed(1)+'k':'€'+fmt(n);
 const gc=id=>CATS.find(c=>c.id===id);
@@ -621,7 +706,7 @@ const pexp=()=>{const d=new Date(now.getFullYear(),now.getMonth()-1,1);return me
 
 function switchView(v){
   view=v;
-  ['home','stats','history','budget','subs','income'].forEach(n=>{
+  ['home','stats','history','budget','subs','income','invest'].forEach(n=>{
     const el=document.getElementById(n+'View');if(el)el.classList.toggle('active',n===v);
     const b=document.getElementById('nav'+n[0].toUpperCase()+n.slice(1));if(b)b.classList.toggle('active',n===v);
   });
@@ -688,10 +773,11 @@ function closeModal(){document.getElementById('moverlay').classList.remove('open
 function closeModalOut(e){if(e.target===document.getElementById('moverlay'))closeModal()}
 function switchTab(t){
   tab=t;
-  ['Exp','Sub','Inc'].forEach(x=>{const el=document.getElementById('tab'+x);if(el)el.classList.toggle('active',t===x.toLowerCase())});
+  ['Exp','Sub','Inc','Inv'].forEach(x=>{const el=document.getElementById('tab'+x);if(el)el.classList.toggle('active',t===x.toLowerCase())});
   document.getElementById('formExp').style.display=t==='exp'?'block':'none';
   document.getElementById('formSub').style.display=t==='sub'?'block':'none';
   document.getElementById('formInc').style.display=t==='inc'?'block':'none';
+  document.getElementById('formInv').style.display=t==='inv'?'block':'none';
 }
 function buildGrid(id,tp){
   const sel=tp==='exp'?sCat:sSubCat;
@@ -792,6 +878,7 @@ const render=()=>{
   if(view==='budget')renderBudget();
   if(view==='subs')renderSubs();
   if(view==='income')renderIncome();
+  if(view==='invest')renderInvest();
 };
 
 function renderHome(){
@@ -831,6 +918,16 @@ function renderHome(){
   document.getElementById('maxCat').textContent=mc?mc.em+' '+mc.nm:'—';
   renderAlerts(ct,total);
   renderInsight(txs,total,prevT,ct,subsMo);
+  // patrimony card on home
+  const totalIncAll=incs.reduce((s,i)=>s+i.amount,0);
+  const totalExpAll=exps.reduce((s,e)=>s+e.amount,0);
+  const liquid=totalIncAll-totalExpAll;
+  const pv=portVal?portVal.value:0;
+  const patr=liquid+pv;
+  const hpEl=document.getElementById('homePatr');
+  const hpPort=document.getElementById('homePort');
+  if(hpEl)hpEl.textContent='€'+fmt(Math.max(patr,0));
+  if(hpPort)hpPort.textContent=pv>0?'€'+fmt(pv):'non impostato';
   const bel=document.getElementById('cbars');
   if(total===0){bel.innerHTML=`<div class="empty"><div class="empty-em">📊</div><div class="empty-ttl">Nessuna spesa</div><div class="empty-sub">Tocca + per aggiungere la prima spesa del mese</div></div>`;document.getElementById('txHome').innerHTML=`<div class="empty"><div class="empty-em">💸</div><div class="empty-ttl">Nessuna transazione</div><div class="empty-sub">Le spese appariranno qui</div></div>`;renderXP();return}
   const sorted=CATS.filter(c=>ct[c.id]).sort((a,b)=>ct[b.id]-ct[a.id]);
@@ -1575,6 +1672,122 @@ function renderAnnual(){
       <div style="font-size:14px;font-weight:700;color:var(--red)">€${fmt(e.amount)}</div>
     </div>`;
   }).join('') : `<div class="empty"><div class="empty-em">🔍</div><div class="empty-ttl">Nessuna spesa</div></div>`;
+}
+
+// ── INVESTMENTS ──
+const INV_TYPES={pac:{em:'🔄',lbl:'PAC periodico'},extra:{em:'➕',lbl:'Versamento extra'},dividend:{em:'💸',lbl:'Dividendo'},sell:{em:'📤',lbl:'Prelievo/Vendita'}};
+
+function openInvModal(){
+  ['invAmt','invDesc','invNote'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('invDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('invType').value='pac';
+  switchTab('inv');
+  document.getElementById('moverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('invAmt').focus(),380);
+}
+
+function addInv(){
+  const amt=parseFloat(document.getElementById('invAmt').value);
+  const desc=document.getElementById('invDesc').value.trim();
+  const date=document.getElementById('invDate').value;
+  const type=document.getElementById('invType').value;
+  const note=document.getElementById('invNote').value.trim();
+  if(!amt||amt<=0||!date){toast('⚠️ Compila importo e data');return}
+  const tp=INV_TYPES[type]||INV_TYPES.pac;
+  invs.unshift({id:Date.now(),amount:amt,desc:desc||(tp.lbl),date,type,emoji:tp.em,note:note||null});
+  sv();closeModal();renderInvest();toast('✓ Versamento aggiunto');
+}
+
+function delInv(id){invs=invs.filter(i=>i.id!==id);sv();renderInvest();toast('Versamento eliminato')}
+
+function updatePortVal(){
+  const v=parseFloat(document.getElementById('invPortInput').value);
+  if(!v||v<0){toast('⚠️ Inserisci un valore valido');return}
+  portVal={value:v,updatedAt:new Date().toISOString().split('T')[0]};
+  document.getElementById('invPortInput').value='';
+  sv();renderInvest();toast('✓ Portafoglio aggiornato');
+}
+
+function renderInvest(){
+  // Liquidità netta totale (tutte le entrate - tutte le uscite - abbonamenti storico)
+  const totalInc=incs.reduce((s,i)=>s+i.amount,0);
+  const totalExp=exps.reduce((s,e)=>s+e.amount,0);
+  const liquid=totalInc-totalExp;
+  const pv=portVal?portVal.value:0;
+  const patrimonio=liquid+pv;
+  document.getElementById('invPatr').textContent=fmt(Math.max(patrimonio,0));
+  document.getElementById('invLiquid').textContent=(liquid>=0?'€':'-€')+fmt(Math.abs(liquid));
+  document.getElementById('invPortVal').textContent=pv>0?'€'+fmt(pv):'—';
+  document.getElementById('invPortDate').innerHTML=portVal?`aggiornato ${portVal.updatedAt}`:'non impostato';
+
+  // KPI
+  const buys=invs.filter(i=>i.type!=='sell'&&i.type!=='dividend');
+  const totPac=buys.reduce((s,i)=>s+i.amount,0);
+  const gain=pv>0?pv-totPac:0;
+  const gainPct=totPac>0?(gain/totPac*100):0;
+  const avgPac=buys.length>0?totPac/buys.length:0;
+  document.getElementById('invTotPAC').textContent='€'+fmtk(totPac);
+  document.getElementById('invPacCnt').textContent=buys.length+' versament'+(buys.length===1?'o':'i');
+  document.getElementById('invGainEur').textContent=(gain>=0?'+€':'-€')+fmt(Math.abs(gain));
+  document.getElementById('invGainEur').style.color=gain>=0?'var(--grn)':'var(--red)';
+  document.getElementById('invGainPct').textContent=(gainPct>=0?'+':'')+gainPct.toFixed(1)+'%';
+  document.getElementById('invAvgPac').textContent='€'+fmt(avgPac);
+
+  // Performance bar
+  const perfBar=document.getElementById('invPerfBar');
+  if(pv>0&&totPac>0){
+    perfBar.style.display='block';
+    const mx=Math.max(pv,totPac);
+    const pctPac=(totPac/mx*100).toFixed(1);
+    const pctPv=(pv/mx*100).toFixed(1);
+    document.getElementById('invPerfFill').style.width=pctPv+'%';
+    document.getElementById('invPerfFill').style.background=gain>=0?'var(--grn)':'var(--red)';
+    document.getElementById('invPerfMk').style.left=pctPac+'%';
+    document.getElementById('invPerfLbl').textContent=(gain>=0?'+':'')+gainPct.toFixed(1)+'%';
+    document.getElementById('invPerfLbl').style.color=gain>=0?'var(--grn)':'var(--red)';
+    document.getElementById('invPerfMax').textContent='€'+fmtk(mx);
+  } else {
+    perfBar.style.display='none';
+  }
+
+  // List
+  const le=document.getElementById('invList');
+  if(!invs.length){
+    le.innerHTML=`<div class="empty"><div class="empty-em">📈</div><div class="empty-ttl">Nessun versamento</div><div class="empty-sub">Tocca "+ Aggiungi" o il tasto + per registrare il tuo primo versamento PAC.</div></div>`;
+    return;
+  }
+  // group by month
+  const g={};
+  invs.forEach(e=>{
+    const d=new Date(e.date+'T00:00:00');
+    const k=d.getFullYear()+'-'+String(d.getMonth()).padStart(2,'0');
+    if(!g[k])g[k]={y:d.getFullYear(),m:d.getMonth(),txs:[]};
+    g[k].txs.push(e);
+  });
+  le.innerHTML=Object.keys(g).sort().reverse().map(k=>{
+    const gk=g[k];
+    const t=gk.txs.filter(i=>i.type!=='sell').reduce((s,i)=>s+i.amount,0);
+    const items=gk.txs.map(e=>{
+      const isSell=e.type==='sell';
+      return `<div class="txi" style="animation-delay:0s">
+        <div class="txi-ic" style="background:${isSell?'var(--redd)':'var(--grnd)'}">
+          <span style="font-size:15px">${e.emoji}</span>
+        </div>
+        <div class="txi-inf">
+          <div class="txi-nm">${e.desc}</div>
+          <div class="txi-mt"><span>${e.date}</span><span class="mtd"></span><span>${INV_TYPES[e.type]?.lbl||e.type}</span>${e.note?`<span class="mtd"></span><span>${e.note}</span>`:''}</div>
+        </div>
+        <div class="txi-r">
+          <div class="txi-amt" style="color:${isSell?'var(--red)':'var(--grn)'}">${isSell?'-':'+'} €${fmt(e.amount)}</div>
+          <div class="txi-acts"><button class="txi-btn" onclick="delInv(${e.id})">✕</button></div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="daygrp">
+      <div class="daylbl"><span>${MO[gk.m]} ${gk.y}</span><span class="daytot">€${fmt(t)}</span></div>
+      <div class="txlist">${items}</div>
+    </div>`;
+  }).join('');
 }
 
 applyTheme();render();
