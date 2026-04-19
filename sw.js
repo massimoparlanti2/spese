@@ -1,4 +1,4 @@
-const CACHE = 'spese-v3';
+const CACHE = 'spese-v4';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
