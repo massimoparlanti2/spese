@@ -1,4 +1,4 @@
-const CACHE = 'spese-v2';
+const CACHE = 'spese-v3';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
@@ -16,7 +16,24 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./index.html')))
-  );
+  const url = new URL(e.request.url);
+  const isHTML = e.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('/');
+
+  if (isHTML) {
+    // Network-first per l'HTML: sempre la versione aggiornata, cache come fallback offline
+    e.respondWith(
+      fetch(e.request)
+        .then(res => {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, copy));
+          return res;
+        })
+        .catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
+    );
+  } else {
+    // Cache-first per tutto il resto (immagini, font, ecc.)
+    e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request).catch(() => {}))
+    );
+  }
 });
